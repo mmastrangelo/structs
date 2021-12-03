@@ -140,8 +140,13 @@ func (s *Struct) FillMap(out map[string]interface{}) {
 		}
 
 		if isSubStruct && (tagOpts.Has("flatten")) {
-			for k := range finalVal.(map[string]interface{}) {
-				out[k] = finalVal.(map[string]interface{})[k]
+			// ** MJM CHANGE **
+			// Safety check: if the "finaVal" was omitted due to omitempty, it will not be a map
+			// Therefore we must check its type before proceeding with the iteration to populate 'out'
+			if fvMap, ok := finalVal.(map[string]interface{}); ok {
+				for k := range fvMap {
+					out[k] = finalVal.(map[string]interface{})[k]
+				}
 			}
 		} else {
 			out[name] = finalVal
